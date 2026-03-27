@@ -1,181 +1,176 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Búsqueda de estudiantes</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f6f8;
-      margin: 0;
-      padding: 0;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Consulta de Estudiantes</title>
 
-    header {
-      background: #0d47a1;
-      color: white;
-      padding: 20px;
-      text-align: center;
-    }
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 
-    main {
-      max-width: 1000px;
-      margin: 30px auto;
-      padding: 20px;
-    }
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #f0f4f8;
+    margin: 0;
+}
 
-    .buscador {
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      margin-bottom: 20px;
-    }
+header {
+    background: #0d47a1;
+    color: white;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
 
-    .buscador label {
-      display: block;
-      font-weight: bold;
-      margin-bottom: 8px;
-    }
+header img {
+    height: 60px;
+}
 
-    .buscador input {
-      width: 100%;
-      padding: 12px;
-      font-size: 16px;
-      border: 1px solid #bbb;
-      border-radius: 8px;
-    }
+header h1 {
+    margin: 0;
+}
 
-    .resultado {
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      margin-bottom: 15px;
-    }
+main {
+    max-width: 1000px;
+    margin: auto;
+    padding: 20px;
+}
 
-    .resultado h2 {
-      margin-top: 0;
-      color: #0d47a1;
-    }
+.buscador {
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
 
-    .dato {
-      margin: 6px 0;
-      font-size: 16px;
-    }
+input {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
 
-    .dato strong {
-      color: #333;
-    }
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 15px;
+}
 
-    .mensaje {
-      background: #fff3cd;
-      color: #856404;
-      padding: 15px;
-      border-radius: 10px;
-      border: 1px solid #ffeeba;
-    }
+.card {
+    background: white;
+    border-radius: 12px;
+    padding: 15px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
 
-    .contador {
-      margin-bottom: 15px;
-      font-weight: bold;
-      color: #333;
-    }
+.card h2 {
+    margin-top: 0;
+    color: #0d47a1;
+}
 
-    @media (max-width: 600px) {
-      main {
-        padding: 12px;
-      }
+.item {
+    margin: 6px 0;
+}
 
-      .resultado, .buscador {
-        padding: 15px;
-      }
-    }
-  </style>
+.icon {
+    margin-right: 6px;
+    color: #0d47a1;
+}
+
+.badge {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 8px;
+    font-size: 13px;
+    color: white;
+}
+
+.si { background: green; }
+.no { background: gray; }
+
+.alerta {
+    background: red;
+}
+
+</style>
 </head>
+
 <body>
-  <header>
-    <h1>Búsqueda de estudiantes</h1>
-    <p>Consulta de información estudiantil</p>
-  </header>
 
-  <main>
-    <div class="buscador">
-      <label for="busqueda">Buscar por nombre, apellidos o cédula:</label>
-      <input
-        type="text"
-        id="busqueda"
-        placeholder="Escriba un nombre, apellido o número de cédula"
-      />
-    </div>
+<header>
+    <img src="escudo.png">
+    <h1>Liceo de Tarrazú</h1>
+</header>
 
-    <div class="contador" id="contador"></div>
-    <div id="resultados"></div>
-  </main>
+<main>
 
-  <script>
-    let estudiantes = [];
+<div class="buscador">
+    <input type="text" id="busqueda" placeholder="Buscar estudiante por nombre o cédula...">
+</div>
 
-    async function cargarEstudiantes() {
-      try {
-        const respuesta = await fetch("estudiantes.json");
-        estudiantes = await respuesta.json();
-        mostrarResultados(estudiantes);
-      } catch (error) {
-        document.getElementById("resultados").innerHTML = `
-          <div class="mensaje">
-            No se pudo cargar el archivo <strong>estudiantes.json</strong>.
-            Verifique que esté en el mismo repositorio y en la misma carpeta que <strong>index.html</strong>.
-          </div>
-        `;
-      }
-    }
+<div class="grid" id="resultados"></div>
 
-    function mostrarResultados(lista) {
-      const contenedor = document.getElementById("resultados");
-      const contador = document.getElementById("contador");
+</main>
 
-      contador.textContent = `Resultados encontrados: ${lista.length}`;
+<script>
 
-      if (lista.length === 0) {
-        contenedor.innerHTML = `
-          <div class="mensaje">
-            No se encontraron estudiantes con ese criterio de búsqueda.
-          </div>
-        `;
-        return;
-      }
+let estudiantes = [];
 
-      contenedor.innerHTML = lista.map(est => `
-        <div class="resultado">
-          <h2>${est.nombreApellidos}</h2>
-          <div class="dato"><strong>Sección:</strong> ${est.seccion}</div>
-          <div class="dato"><strong>Cédula:</strong> ${est.cedula}</div>
-          <div class="dato"><strong>Teléfono:</strong> ${est.telefono}</div>
-          <div class="dato"><strong>Nombre del encargado:</strong> ${est.nombreEncargado}</div>
-          <div class="dato"><strong>Teléfono del encargado:</strong> ${est.telefonoEncargado}</div>
-          <div class="dato"><strong>Tiene beca de comedor:</strong> ${est.tieneBecaComedor}</div>
-          <div class="dato"><strong>Tiene permiso para salir a almorzar:</strong> ${est.tienePermisoSalirAlmorzar}</div>
-          <div class="dato"><strong>Transporte:</strong> ${est.transporte}</div>
-          <div class="dato"><strong>Alguna situación de salud:</strong> ${est.situacionSalud}</div>
-          <div class="dato"><strong>Acción correctiva que le impida entrar al colegio:</strong> ${est.accionCorrectiva || "Ninguna"}</div>
+async function cargar() {
+    const res = await fetch("estudiantes.json");
+    estudiantes = await res.json();
+    mostrar(estudiantes);
+}
+
+function mostrar(lista) {
+    const cont = document.getElementById("resultados");
+
+    cont.innerHTML = lista.map(e => `
+        <div class="card">
+            <h2>${e.nombreApellidos}</h2>
+
+            <div class="item"><i class="fa fa-id-card icon"></i> ${e.cedula}</div>
+            <div class="item"><i class="fa fa-users icon"></i> Sección: ${e.seccion}</div>
+            <div class="item"><i class="fa fa-phone icon"></i> ${e.telefono}</div>
+
+            <hr>
+
+            <div class="item"><strong>Encargado:</strong> ${e.nombreEncargado}</div>
+            <div class="item"><i class="fa fa-phone icon"></i> ${e.telefonoEncargado}</div>
+
+            <hr>
+
+            <div class="item">🍽️ Beca: <span class="badge ${e.tieneBecaComedor}">${e.tieneBecaComedor}</span></div>
+            <div class="item">🚶 Permiso: <span class="badge ${e.tienePermisoSalirAlmorzar}">${e.tienePermisoSalirAlmorzar}</span></div>
+            <div class="item">🚌 Transporte: <span class="badge ${e.transporte}">${e.transporte}</span></div>
+
+            <hr>
+
+            <div class="item">🩺 Salud: ${e.situacionSalud}</div>
+            <div class="item ${e.accionCorrectiva ? 'alerta' : ''}">
+                🚫 ${e.accionCorrectiva || "Sin restricciones"}
+            </div>
+
         </div>
-      `).join("");
-    }
+    `).join("");
+}
 
-    document.getElementById("busqueda").addEventListener("input", function() {
-      const texto = this.value.trim().toLowerCase();
+document.getElementById("busqueda").addEventListener("input", function() {
+    const t = this.value.toLowerCase();
 
-      const filtrados = estudiantes.filter(est =>
-        est.nombreApellidos.toLowerCase().includes(texto) ||
-        est.cedula.toLowerCase().includes(texto)
-      );
+    const filtrados = estudiantes.filter(e =>
+        e.nombreApellidos.toLowerCase().includes(t) ||
+        e.cedula.includes(t)
+    );
 
-      mostrarResultados(filtrados);
-    });
+    mostrar(filtrados);
+});
 
-    cargarEstudiantes();
-  </script>
+cargar();
+
+</script>
+
 </body>
 </html>
