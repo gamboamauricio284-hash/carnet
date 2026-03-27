@@ -8,9 +8,10 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 
 <style>
+
 body {
-    font-family: Arial, sans-serif;
-    background: #f0f4f8;
+    font-family: Arial;
+    background: #eef3f8;
     margin: 0;
 }
 
@@ -25,10 +26,6 @@ header {
 
 header img {
     height: 60px;
-}
-
-header h1 {
-    margin: 0;
 }
 
 main {
@@ -54,7 +51,7 @@ input {
 
 .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
     gap: 15px;
 }
 
@@ -62,16 +59,15 @@ input {
     background: white;
     border-radius: 12px;
     padding: 15px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
 }
 
 .card h2 {
-    margin-top: 0;
     color: #0d47a1;
 }
 
 .item {
-    margin: 6px 0;
+    margin: 8px 0;
 }
 
 .icon {
@@ -80,18 +76,36 @@ input {
 }
 
 .badge {
-    display: inline-block;
-    padding: 5px 10px;
+    padding: 4px 10px;
     border-radius: 8px;
-    font-size: 13px;
     color: white;
+    font-size: 13px;
 }
 
 .si { background: green; }
 .no { background: gray; }
 
+.salud {
+    background: #fff3cd;
+    padding: 6px;
+    border-radius: 6px;
+}
+
 .alerta {
     background: red;
+    color: white;
+    padding: 6px;
+    border-radius: 6px;
+    font-weight: bold;
+}
+
+.whatsapp {
+    background: #25D366;
+    color: white;
+    padding: 5px 8px;
+    border-radius: 6px;
+    margin-left: 5px;
+    text-decoration: none;
 }
 
 </style>
@@ -100,14 +114,15 @@ input {
 <body>
 
 <header>
-    <img src="Escudo.png">
+    <img src="escudo.png">
     <h1>Liceo de Tarrazú</h1>
 </header>
 
 <main>
 
 <div class="buscador">
-    <input type="text" id="busqueda" placeholder="Buscar estudiante por nombre o cédula...">
+    <label><strong>Escribe el nombre o una parte del nombre para buscar:</strong></label>
+    <input type="text" id="busqueda" placeholder="Ejemplo: Mora, María...">
 </div>
 
 <div class="grid" id="resultados"></div>
@@ -118,6 +133,14 @@ input {
 
 let estudiantes = [];
 
+function telefonoCR(num){
+    return "506" + num;
+}
+
+function whatsappLink(num, nombre){
+    return `https://wa.me/${telefonoCR(num)}?text=Hola,%20le%20escribo%20del%20Liceo%20de%20Tarrazú%20por%20el%20estudiante%20${nombre}`;
+}
+
 async function cargar() {
     const res = await fetch("estudiantes.json");
     estudiantes = await res.json();
@@ -127,34 +150,71 @@ async function cargar() {
 function mostrar(lista) {
     const cont = document.getElementById("resultados");
 
-    cont.innerHTML = lista.map(e => `
+    cont.innerHTML = lista.map(e => {
+
+        let claseSalud = e.situacionSalud !== "no" ? "salud" : "";
+        let claseAlerta = e.accionCorrectiva ? "alerta" : "";
+
+        return `
         <div class="card">
+
             <h2>${e.nombreApellidos}</h2>
 
-            <div class="item"><i class="fa fa-id-card icon"></i> ${e.cedula}</div>
-            <div class="item"><i class="fa fa-users icon"></i> Sección: ${e.seccion}</div>
-            <div class="item"><i class="fa fa-phone icon"></i> ${e.telefono}</div>
+            <div class="item">
+                <i class="fa fa-id-card icon"></i>
+                ${e.cedula}
+            </div>
+
+            <div class="item">
+                <i class="fa fa-users icon"></i>
+                Sección: ${e.seccion}
+            </div>
+
+            <div class="item">
+                <i class="fa fa-phone icon"></i>
+                ${e.telefono}
+                <a class="whatsapp" href="${whatsappLink(e.telefono, e.nombreApellidos)}" target="_blank">
+                    <i class="fab fa-whatsapp"></i>
+                </a>
+            </div>
 
             <hr>
 
             <div class="item"><strong>Encargado:</strong> ${e.nombreEncargado}</div>
-            <div class="item"><i class="fa fa-phone icon"></i> ${e.telefonoEncargado}</div>
+
+            <div class="item">
+                <i class="fa fa-phone icon"></i>
+                ${e.telefonoEncargado}
+                <a class="whatsapp" href="${whatsappLink(e.telefonoEncargado, e.nombreApellidos)}" target="_blank">
+                    <i class="fab fa-whatsapp"></i>
+                </a>
+            </div>
 
             <hr>
 
             <div class="item">🍽️ Beca: <span class="badge ${e.tieneBecaComedor}">${e.tieneBecaComedor}</span></div>
-            <div class="item">🚶 Permiso: <span class="badge ${e.tienePermisoSalirAlmorzar}">${e.tienePermisoSalirAlmorzar}</span></div>
-            <div class="item">🚌 Transporte: <span class="badge ${e.transporte}">${e.transporte}</span></div>
+
+            <div class="item">🚶 Permiso para salir a almorzar: 
+                <span class="badge ${e.tienePermisoSalirAlmorzar}">${e.tienePermisoSalirAlmorzar}</span>
+            </div>
+
+            <div class="item">🚌 Transporte: 
+                <span class="badge ${e.transporte}">${e.transporte}</span>
+            </div>
 
             <hr>
 
-            <div class="item">🩺 Salud: ${e.situacionSalud}</div>
-            <div class="item ${e.accionCorrectiva ? 'alerta' : ''}">
+            <div class="item ${claseSalud}">
+                🩺 Alguna situación de salud: ${e.situacionSalud}
+            </div>
+
+            <div class="item ${claseAlerta}">
                 🚫 ${e.accionCorrectiva || "Sin restricciones"}
             </div>
 
         </div>
-    `).join("");
+        `;
+    }).join("");
 }
 
 document.getElementById("busqueda").addEventListener("input", function() {
